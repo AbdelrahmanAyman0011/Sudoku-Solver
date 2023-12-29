@@ -46,25 +46,87 @@ def get_input(selected, board, key):
         if valid(board, int(key), (row, col)):  # Check if the input is valid for the selected cell
             board[row][col] = int(key)
 
+def menu_screen():
+    button_width, button_height = 150, 40
+    button_x, button_y = (WIDTH - button_width) // 2, (HEIGHT - button_height * 2) // 2
+
+    solving_button = pygame.Rect(button_x, button_y, button_width, button_height)
+    input_button = pygame.Rect(button_x, button_y + button_height + 20, button_width, button_height)
+
+    solve_text = font.render("Solve", True, BLACK)
+    input_text = font.render("Input", True, BLACK)
+
+    show_menu = True
+    solving = False
+    custom_input = False
+
+    while show_menu:
+        win.fill(WHITE)
+
+        pygame.draw.rect(win, GRAY, solving_button)
+        pygame.draw.rect(win, GRAY, input_button)
+
+        win.blit(solve_text, (solving_button.x + 20, solving_button.y + 10))
+        win.blit(input_text, (input_button.x + 20, input_button.y + 10))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                show_menu = False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                x, y = pygame.mouse.get_pos()
+                if solving_button.collidepoint(x, y):
+                    solving = True
+                    show_menu = False
+                elif input_button.collidepoint(x, y):
+                    custom_input = True
+                    show_menu = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_s:
+                    custom_input = True
+                    show_menu = False
+
+        pygame.display.update()
+
+    return solving, custom_input
+
+def solve_board(board):
+    solve(board)
+
 # Main game loop
 def main():
-    board = [[0 for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]  # Initialize an empty board
+    solving, custom_input = menu_screen()
+
+    board = [[0 for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)] if custom_input else [
+        [5, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 8, 0, 0, 0, 4, 0],
+        [7, 0, 6, 0, 0, 3, 0, 1, 0],
+        [0, 0, 0, 0, 0, 1, 0, 7, 0],
+        [0, 9, 0, 0, 0, 0, 0, 0, 8],
+        [0, 0, 3, 0, 4, 0, 0, 0, 0],
+        [0, 0, 7, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 8, 0, 0, 6, 0],
+        [0, 0, 0, 0, 0, 5, 0, 0, 3]
+    ]  # Initialize an empty or pre-defined board
+
     selected = None  # Selected cell
+    button_width, button_height = 200, 50
+    button_x, button_y = (WIDTH - button_width) // 2, HEIGHT - 50  # Adjusted y-coordinate
+    button_color = GRAY
+    text_color = BLACK
+    text = "Click Me"
+    font = pygame.font.Font(None, 36)
 
     running = True
-    solving = False
-
-    solving_button = pygame.Rect(200, 550, 140, 40)  # Create a solving button
-    solving_text = font.render("Solve", True, BLACK)
 
     while running:
         win.fill(WHITE)
         draw_grid(board, selected)
-
-        pygame.draw.rect(win, GRAY, solving_button)  # Draw the button
-        win.blit(solving_text, (solving_button.x + 40, solving_button.y + 10))  # Position the text
-
-
+        pygame.draw.rect(win, button_color, (button_x, button_y, button_width, button_height))
+        # Render text on the button
+        text_surface = font.render(text, True, text_color)
+        text_rect = text_surface.get_rect(center=(button_x + button_width // 2, button_y + button_height // 2))
+        win.blit(text_surface, text_rect)
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -73,8 +135,9 @@ def main():
                 col = x // CELL_SIZE
                 row = y // CELL_SIZE
                 selected = (col, row)
-                if solving_button.collidepoint(x, y):  # Check if the button was clicked
-                    solve(board)
+                if solving:
+                    solve_board(board)
+                    solving = False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     solving = True
