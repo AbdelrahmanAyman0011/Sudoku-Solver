@@ -1,5 +1,5 @@
 import pygame
-from solver import solve, valid, print_board  # Import your solver functions
+from solver import solve,apply_arc_consistency, valid, print_board  # Import your solver functions
 
 # Initialize Pygame
 pygame.init()
@@ -90,7 +90,9 @@ def menu_screen():
     return solving, custom_input
 
 def solve_board(board):
+    apply_arc_consistency(board)
     solve(board)
+    
 
 # Main game loop
 def main():
