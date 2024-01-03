@@ -1,3 +1,4 @@
+import time
 def remove_inconsistent_values(board, arc): # 6  # Removes inconsistent values between two cells in the Sudoku board
     Xi, Xj = arc # Extract the two cells involved in the arc
     revised = False # Initialize a flag to track if values are revised
@@ -102,8 +103,14 @@ def is_board_solved(board): # 8
 
 
 def solve(board): # 1  Function to solve the Sudoku puzzle using backtracking
+    start_time = time.time()  # Start timing
+    
     empty_cell = find_empty_cell(board) # Find an empty cell in the Sudoku board
     if not empty_cell:  # If no empty cells are left, the board is solved
+        end_time = time.time()  # End timing
+        print("************************")
+        print(f"Solving Time: {end_time - start_time} seconds")
+        print("************************")
         return True
     else:
         row, col = empty_cell # Get the indices of the empty cell
@@ -116,13 +123,31 @@ def solve(board): # 1  Function to solve the Sudoku puzzle using backtracking
             board_copy = [row[:] for row in board] # Make a copy of the current board
             apply_arc_consistency(board_copy) # Apply arc consistency to the copied board
 
+
+            #<-------------- Capture the Arc Consistency Tree ---------->
+           # arcs = generate_all_arcs()
+           # apply_arc_consistency(board_copy) # Apply arc consistency to the copied board
+           # arcs_tree = arcs  # Replace with the actual tree generated during solving
+
+            # Display Arc Consistency Tree
+            #print("****** Arc Consistency Tree ******")
+            
+            #print(arcs_tree)
+
             #display_board(board_copy) display all iterations   <-------
+
+            # solve after each arc
+           # end_time = time.time()  # End timing
+           # print("************************")
+           # print(f"Solving Time: {end_time - start_time} seconds")
+           # print("************************")
 
             if is_board_solved(board_copy) and solve(board_copy):
                 # Copy back the solved values to the original board
                 for i in range(9):
                     for j in range(9):
                         board[i][j] = board_copy[i][j]
+                
                 return True # Return True if the puzzle is solved
     
             board[row][col] = 0 # If no solution, reset the cell to 0 for backtracking
