@@ -41,7 +41,7 @@ def draw_grid(board, selected):
 
 # Function to update the board based on user input
 def get_input(selected, board, key):
-    col, row = selected
+    col, row = selected # Extract the selected cell's column and row values
     if selected and 0 <= row < GRID_SIZE and 0 <= col < GRID_SIZE and key.isdigit() and 1 <= int(key) <= 9:
         if valid(board, int(key), (row, col)):  # Check if the input is valid for the selected cell
             board[row][col] = int(key)
