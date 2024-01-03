@@ -90,7 +90,6 @@ def menu_screen():
     return solving, custom_input
 
 def solve_board(board):
-    apply_arc_consistency(board)
     solve(board)
     
 
